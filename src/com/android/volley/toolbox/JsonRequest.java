@@ -16,6 +16,7 @@
 
 package com.android.volley.toolbox;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -24,6 +25,8 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyLog;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A request for retrieving a T type response body at a given URL that also
@@ -32,12 +35,18 @@ import java.io.UnsupportedEncodingException;
  * @param <T> JSON type of response expected
  */
 public abstract class JsonRequest<T> extends Request<T> {
-    /** Charset for request. */
+
+    /**
+     * Charset for request.
+     */
     private static final String PROTOCOL_CHARSET = "utf-8";
 
-    /** Content type for request. */
-    private static final String PROTOCOL_CONTENT_TYPE =
-        String.format("application/json; charset=%s", PROTOCOL_CHARSET);
+    /**
+     * Content type for request.
+     */
+    private static final String PROTOCOL_CONTENT_TYPE = "application/json";
+    private static final String PROTOCOL_RESPONSE_CONTENT_TYPE = "application/json; charset=" + PROTOCOL_CHARSET;
+
 
     private final Listener<T> mListener;
     private final String mRequestBody;
@@ -49,12 +58,12 @@ public abstract class JsonRequest<T> extends Request<T> {
      * @deprecated Use {@link #JsonRequest(int, String, String, Listener, ErrorListener)}.
      */
     public JsonRequest(String url, String requestBody, Listener<T> listener,
-            ErrorListener errorListener) {
+                       ErrorListener errorListener) {
         this(Method.DEPRECATED_GET_OR_POST, url, requestBody, listener, errorListener);
     }
 
     public JsonRequest(int method, String url, String requestBody, Listener<T> listener,
-            ErrorListener errorListener) {
+                       ErrorListener errorListener) {
         super(method, url, errorListener);
         mListener = listener;
         mRequestBody = requestBody;
@@ -67,6 +76,15 @@ public abstract class JsonRequest<T> extends Request<T> {
 
     @Override
     abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
+
+    @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> map = new HashMap<String, String>();
+        map.putAll(super.getHeaders());
+        map.put("Accept", PROTOCOL_CONTENT_TYPE);
+        map.put("Accept-Charset", PROTOCOL_CHARSET);
+        return map;
+    }
 
     /**
      * @deprecated Use {@link #getBodyContentType()}.
@@ -86,7 +104,7 @@ public abstract class JsonRequest<T> extends Request<T> {
 
     @Override
     public String getBodyContentType() {
-        return PROTOCOL_CONTENT_TYPE;
+        return PROTOCOL_RESPONSE_CONTENT_TYPE;
     }
 
     @Override
