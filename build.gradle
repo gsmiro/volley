@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.11.+'
+    }
+}
+
+apply plugin: 'android-library'
+
+dependencies {
+    compile 'com.fasterxml.jackson.jr:jackson-jr-objects:2.4.0'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion = "19.1.0"
+    defaultConfig {
+        minSdkVersion 8
+    }
+    sourceSets {
+        defaultConfig {
+            testApplicationId 'com.android.volley.tests'
+        }
+
+        main {
+            assets.srcDirs = ['assets']
+            res.srcDirs = ['res']
+            aidl.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            java.srcDirs = ['src']
+            manifest.srcFile 'AndroidManifest.xml'
+
+        }
+
+        instrumentTest.setRoot('tests')
+        instrumentTest.java.srcDirs = ['tests/src']
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    defaultConfig {}
+    productFlavors {
+    }
+    buildTypes {
+    }
+}
